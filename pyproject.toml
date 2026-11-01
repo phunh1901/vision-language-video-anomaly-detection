@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "temporal-hoi-video-text-matching"
 version = "0.1.0"
-description = "Research prototype for vision-language human-object interaction detection and video-text retrieval"
+description = "CLIP-based weakly supervised video anomaly detection research with VadCLIP"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
@@ -28,7 +28,7 @@ dependencies = [
 dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/temporal_hoi"]
+packages = ["versions/_dev/common/clip_vad"]
 
 [tool.uv]
 cache-dir = ".cache/uv"

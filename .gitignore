@@ -1,23 +1,54 @@
-# Python environments and generated files
-.venv/
-venv/
-__pycache__/
-*.py[cod]
-*.egg-info/
-.pytest_cache/
-.ruff_cache/
-.mypy_cache/
-.coverage
-htmlcov/
-build/
-dist/
-.cache/
-.ipynb_checkpoints/
+# Only code, tests, lightweight output and repository metadata are eligible.
+/*
+!/.gitignore
+!/.gitattributes
+!/README.md
+!/pyproject.toml
+!/uv.lock
+!/versions/
+!/tests/
+!/results/
 
-# Local configuration, secrets and credentials
+# Reviewed text output only; no raw archives, weights, predictions or arbitrary files.
+/results/**
+!/results/README.md
+!/results/V[0-9][0-9]/
+!/results/V[0-9][0-9]/*/
+!/results/V[0-9][0-9]/*/notes.md
+!/results/V[0-9][0-9]/*/metrics.json
+!/results/_unassigned/
+!/results/_unassigned/*/
+!/results/_unassigned/*/notes.md
+!/results/_unassigned/*/metrics.json
+
+# Personal tracking, agent rules and private project documents at any depth.
+AGENTS.md
+agents.md
+plan.md
+PLAN.md
+rule.md
+rules.md
+rubric.md
+rubik.md
+HUONG_DAN_TIEN_DO.md
+*TIEN_DO*
+*tien_do*
+*Ke_hoach*
+*ke_hoach*
+.agents/
+.codex/
+.aws/
+.ssh/
+/docs/
+/reports/
+/noiquy/
+/data/
+/weights/
+/outputs/
+
+# Credentials: do not publish local account files, including sample env copies.
 .env
 .env.*
-!.env.example
 *.pem
 *.key
 id_rsa*
@@ -26,17 +57,38 @@ kaggle.json
 credentials.json
 client_secret*.json
 service-account*.json
+service_account*.json
 *.token
 token.json
 .netrc
+.git-credentials
+.npmrc
 
-# Data (all raw datasets, processed data, manifests and annotations)
-/data/
-*.csv
-checkpoints/
+# Generated files and local environments.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.cache/
+.ipynb_checkpoints/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Raw data, binary model output, media and archives.
+data/
+datasets/
+raw_data/
+processed_data/
+features/
+embeddings/
 weights/
-outputs/
-runs/
+checkpoints/
 wandb/
 mlruns/
 *.pt
@@ -50,22 +102,49 @@ mlruns/
 *.npy
 *.npz
 *.log
+*.csv
+*.tsv
+*.jsonl
+*.parquet
+*.arrow
+*.feather
+*.h5
+*.hdf5
+*.hdf
+*.tfrecord
+*.tfrecords
+*.db
+*.sqlite
+*.sqlite3
 events.out.tfevents.*
-
-# Large media & archive files (prevents breaking GitHub 100MB limit)
-*.mp4
-*.avi
-*.mov
-*.mkv
-*.webm
 *.zip
 *.tar
 *.tar.gz
 *.tgz
 *.rar
 *.7z
+*.part
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.tif
+*.tiff
+*.wav
+*.mp3
+*.flac
+*.pdf
+*.docx
+*.pptx
+*.xlsx
+*.xls
 
-# Editor/OS/Office temporary files
+# Editor, OS and Office temporary files.
 .idea/
 .vscode/
 .DS_Store
@@ -75,25 +154,3 @@ desktop.ini
 *.tmp
 *.swp
 *.swo
-
-# Reports and personal tracking (stored on Google Drive)
-docs/reports/
-reports/
-/reports/report_checkpoints.md
-*.pdf
-plan.md
-/HUONG_DAN_TIEN_DO.md
-*Ke_hoach_do_an_10_tuan*
-*.xlsx
-*.xls
-
-# AI agent instructions and rules
-.agents/
-/AGENTS.md
-
-# Internal university regulations and guidance
-/noiquy/
-
-# Local compliance documents derived from internal guidance
-/rubric.md
-/rules.md

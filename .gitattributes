@@ -1,9 +1,9 @@
-# Preserve hash-pinned source snapshots across Windows and Unix checkouts.
-scripts/kaggle/msrvtt/*.py -text
-scripts/kaggle/msrvtt/vendor/* -text
-src/temporal_hoi/evaluation/reference/clip4clip_metrics.py.txt -text
-
-# These captured files use CRLF; keep the normal whitespace checks and recognize CRLF.
-scripts/kaggle/msrvtt/retrieval_core.py whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-scripts/kaggle/msrvtt/test_core.py whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-scripts/kaggle/msrvtt/workflow.py whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve bytes used by notebook/source hash verification across checkouts.
+/versions/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+/tests/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+/results/** text eol=lf
+/README.md text eol=lf
+/.gitignore text eol=lf
+/.gitattributes text eol=lf
+/pyproject.toml text eol=lf
+/uv.lock text eol=lf
