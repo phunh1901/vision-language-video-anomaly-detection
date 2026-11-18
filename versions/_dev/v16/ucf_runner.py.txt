@@ -1,0 +1,524 @@
+def main():
+    COMMIT = "c41067f07d252efcda18008bea367886070c33b0"
+    UPSTREAM_URL = "https://github.com/nwpu-zxr/VadCLIP.git"
+    EXPECTED_INPUTS = {
+        "checkpoint_sha256": "d064aba05190ce5f6652151e6259b24ca6dda83a1e6289bf343afb6f905a2c79",
+        "split_sha256": "d621f4ccfb3e26274d215ad53b83fd1f596bb7e9f85cde69e01399db3da97c7f",
+        "ground_truth_sha256": "c6448801e0f73d19adf82506cd58d60a90c4f0913e49dcc1ad1d677ee12d6301",
+        "annotation_sha256": "82d581cd4685480ffda23eb0fe1bca441b672bfe99c457adca2df4cf4780c503",
+        "feature_inventory_sha256": "8aa3a3c58f9bbbcc8082e024f3892e014f059374e8b52ca737ae709945210026"
+    }
+
+    import csv
+    import hashlib
+    import importlib.util
+    import json
+    import os
+    import re
+    import subprocess
+    import sys
+    import tempfile
+    import time
+    from collections import defaultdict
+    from shutil import copyfile, copyfileobj, copytree
+    from urllib.error import URLError
+    from zipfile import BadZipFile, ZipFile
+
+    if not INPUT.is_dir():
+        raise FileNotFoundError("Import notebook trên Kaggle và gắn input trước.")
+
+    def git(*args):
+        return subprocess.check_output(["git", *map(str, args)], text=True).strip()
+
+
+    if not SRC_REPO.exists():
+        SRC_REPO.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=SRC_REPO.parent) as checkout_dir:
+            checkout = Path(checkout_dir) / "source"
+            subprocess.run(["git", "clone", UPSTREAM_URL, str(checkout)], check=True)
+            subprocess.run(["git", "-C", str(checkout), "checkout", "--detach", COMMIT], check=True)
+            checkout.rename(SRC_REPO)
+    if git("-C", SRC_REPO, "rev-parse", "HEAD") != COMMIT:
+        raise RuntimeError(f"Mã nguồn tại {SRC_REPO} sai commit. Hãy dùng thư mục nguồn mới.")
+    if git("-C", SRC_REPO, "status", "--porcelain", "--untracked-files=no"):
+        raise RuntimeError(f"Mã nguồn tại {SRC_REPO} có thay đổi. Hãy dùng checkout sạch.")
+
+    packages = {
+        "ftfy": "ftfy", "packaging": "packaging", "regex": "regex",
+        "tqdm": "tqdm", "sklearn": "scikit-learn",
+    }
+    missing_packages = [pkg for mod, pkg in packages.items() if importlib.util.find_spec(mod) is None]
+    if missing_packages:
+        subprocess.run([sys.executable, "-m", "pip", "install", *missing_packages], check=True)
+
+    np = importlib.import_module("numpy")
+
+    # Modern setuptools no longer ships pkg_resources. Adapt the import in a copy.
+    stage_directory = tempfile.TemporaryDirectory(prefix="vadclip_ucf_v5_")
+    staging = Path(stage_directory.name)
+    runtime_src = staging / "runtime"
+    copytree(SRC_REPO / "src", runtime_src, dirs_exist_ok=True)
+    from anchor import anchor_forward, patch_model_file
+    model_receipt = patch_model_file(runtime_src / 'model.py')
+    anchor_records = []
+
+    clip_py = runtime_src / "clip" / "clip.py"
+    clip_source = clip_py.read_text(encoding="utf-8")
+    old_import = "from pkg_resources import packaging"
+    if clip_source.count(old_import) != 1:
+        raise RuntimeError("Không tìm thấy import CLIP cần sửa tương thích. Kiểm commit.")
+    clip_py.write_text(clip_source.replace(old_import, "import packaging.version"), encoding="utf-8")
+
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    print("Commit VadCLIP", COMMIT)
+    print(f"Chấm UCF-Crime: {VARIANT}")
+
+    CLASSES = (
+        "Normal", "Abuse", "Arrest", "Arson", "Assault", "Burglary", "Explosion",
+        "Fighting", "RoadAccidents", "Robbery", "Shooting", "Shoplifting", "Stealing", "Vandalism",
+    )
+    FRAMES_PER_FEATURE = 16
+    FEATURE_DIM = 512
+    VIDEO_COUNT = 290
+    CLIP_SHA256 = "5806e77cd80f8b59890b7e101eabd078d9fb84e6937f9e85e4ecb61988df416f"
+
+
+    def sha256(path):
+        with path.open("rb") as stream:
+            return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+    def read_split(list_root):
+        """Đọc theo đúng thứ tự repo. Tính khoảng [start, end) theo frame gốc."""
+        with (list_root / "ucf_CLIP_rgbtest.csv").open(newline="", encoding="utf-8") as stream:
+            entries = list(csv.DictReader(stream))
+        annotations = {}
+        for line in (list_root / "Temporal_Anomaly_Annotation.txt").read_text().splitlines():
+            if not line.strip():
+                continue
+            name, label, *bounds = line.split()
+            video_id = Path(name).stem
+            if len(bounds) != 4 or video_id in annotations:
+                raise ValueError(f"Annotation không hợp lệ: {video_id}")
+            intervals = []
+            for start, end in zip(bounds[::2], bounds[1::2]):
+                lo, hi = int(start), int(end)
+                if (lo, hi) == (-1, -1):
+                    continue
+                if not 0 <= lo < hi:
+                    raise ValueError(f"Khoảng frame không hợp lệ: {video_id} {(lo, hi)}")
+                intervals.append((lo, hi))
+            annotations[video_id] = (label, intervals)
+
+        rows = []
+        for entry in entries:
+            feature_name = Path(entry["path"]).name
+            match = re.fullmatch(r"(.+)__([0-9])\.npy", feature_name)
+            if match is None:
+                raise ValueError(f"Tên feature sai: {feature_name}")
+            video_id, crop = match.groups()
+            label, intervals = annotations[video_id]
+            if label != entry["label"] or label not in CLASSES:
+                raise ValueError(f"Nhãn không khớp giữa CSV và annotation: {video_id}")
+            rows.append({
+                "id": video_id, "label": label, "feature_name": feature_name,
+                "crop": int(crop), "intervals": intervals,
+            })
+        if len(rows) != VIDEO_COUNT or len({row["id"] for row in rows}) != VIDEO_COUNT:
+            raise ValueError("Cần đúng 290 ID duy nhất từ split UCF-Crime chính thức.")
+        return rows
+
+
+
+    def stage_member(archive, member, destination):
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with archive.open(member) as source, destination.open("wb") as target:
+            copyfileobj(source, target, length=1024 * 1024)
+        return destination
+
+
+    def find_inputs(root, keys):
+        """Tìm theo tên file chính thức, kể cả khi Kaggle giữ ZIP nguyên gói."""
+        found = defaultdict(list)
+        if root.is_file():
+            archive_path = root
+        elif root.is_dir():
+            for folder, _, filenames in os.walk(root):
+                for name in filenames:
+                    key = name.casefold()
+                    if key in keys:
+                        found[key].append(Path(folder) / name)
+            if found:
+                return found
+            archives = sorted(root.rglob("ucfclipfeatures_test290.zip"))
+            if len(archives) != 1:
+                raise RuntimeError(
+                    "Gắn Dataset feature UCF-Crime của V0 hoặc chỉ định DATA_ROOT."
+                )
+            archive_path = archives[0]
+        else:
+            raise FileNotFoundError(f"Không thấy DATA_ROOT: {root}")
+
+        with ZipFile(archive_path) as archive:
+            for index, member in enumerate(archive.infolist()):
+                name = Path(member.filename).name
+                key = name.casefold()
+                if not member.is_dir() and key in keys:
+                    destination = staging / "features" / str(index) / name
+                    found[key].append(stage_member(archive, member, destination))
+        return found
+
+
+    def checkpoint_candidates():
+        if CHECKPOINT is not None:
+            path = Path(CHECKPOINT)
+            if not path.is_file():
+                raise FileNotFoundError(f"UCF_CHECKPOINT không trỏ đến file đang gắn: {path}")
+            return [path]
+
+        candidates = []
+        for path in INPUT.rglob("*"):
+            if path.suffix.lower() not in {".pth", ".zip"}:
+                continue
+            name = path.stem.casefold()
+            is_ucf_checkpoint = name.startswith("model_ucf") or ("ucf" in name and "checkpoint" in name)
+            if is_ucf_checkpoint and path.is_file():
+                candidates.append(path)
+        return sorted(candidates, key=lambda path: (path.suffix.lower() == ".zip", str(path)))
+
+
+    def choose_checkpoint():
+        expected = EXPECTED_INPUTS["checkpoint_sha256"]
+        candidates = checkpoint_candidates()
+        if not candidates:
+            raise FileNotFoundError(
+                "Không thấy checkpoint UCF trong /kaggle/input. Vào Add Input và gắn Dataset có "
+                "model_ucf.pth hoặc vadclip_ucf_checkpoint_upload.zip. Nếu tên khác, "
+                "đặt UCF_CHECKPOINT thành đường dẫn đầy đủ của file."
+            )
+
+        rejected = []
+        for path in candidates:
+            try:
+                if path.suffix.lower() == ".zip":
+                    with ZipFile(path) as archive:
+                        members = [
+                            item for item in archive.infolist()
+                            if not item.is_dir() and Path(item.filename).name.casefold() == "model_ucf.pth"
+                        ]
+                        for member in members:
+                            with archive.open(member) as stream:
+                                digest = hashlib.file_digest(stream, "sha256").hexdigest()
+                            if digest == expected:
+                                print(f"Checkpoint UCF V0 khớp SHA-256: {path} ({member.filename})")
+                                return stage_member(archive, member, staging / "checkpoint" / "model_ucf.pth")
+                    rejected.append(f"{path.name} không chứa model_ucf.pth khớp SHA-256")
+                elif sha256(path) == expected:
+                    print(f"Checkpoint UCF V0 khớp SHA-256: {path}")
+                    return path
+                else:
+                    rejected.append(f"{path.name} sai SHA-256")
+            except (BadZipFile, OSError) as exc:
+                rejected.append(f"{path.name}: {exc}")
+        raise ValueError("Không tìm được checkpoint UCF đúng hash V0. " + "; ".join(rejected))
+
+
+    def input_fingerprint(rows, list_root, checkpoint_path):
+        inventory = [[row["id"], row["label"], row["steps"], row["feature_sha256"]] for row in rows]
+        inventory_bytes = json.dumps(inventory, separators=(",", ":")).encode()
+        return {
+            "checkpoint_sha256": sha256(checkpoint_path),
+            "split_sha256": sha256(list_root / "ucf_CLIP_rgbtest.csv"),
+            "ground_truth_sha256": sha256(list_root / "gt_ucf.npy"),
+            "annotation_sha256": sha256(list_root / "Temporal_Anomaly_Annotation.txt"),
+            "feature_inventory_sha256": hashlib.sha256(inventory_bytes).hexdigest(),
+        }
+
+
+    def prepare_clip_cache(source, cache_dir):
+        """Đặt file OpenAI đã xác minh vào đúng cache mà loader gốc đọc."""
+        if not source.is_file():
+            raise FileNotFoundError(f"Không thấy CLIP_WEIGHTS: {source}")
+        if sha256(source) != CLIP_SHA256:
+            raise ValueError("CLIP_WEIGHTS sai SHA-256 của OpenAI ViT-B-16.pt.")
+        target = cache_dir / "ViT-B-16.pt"
+        if target.is_file() and sha256(target) == CLIP_SHA256:
+            return target
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        temporary = cache_dir / "ViT-B-16.pt.vadclip-part"
+        copyfile(source, temporary)
+        if sha256(temporary) != CLIP_SHA256:
+            raise ValueError("Bản sao CLIP lỗi. Kiểm dung lượng và file input.")
+        temporary.replace(target)
+        return target
+
+
+    def feature_array(path):
+        array = np.load(path, mmap_mode="r", allow_pickle=False)
+        if array.ndim != 2 or array.shape[1] != FEATURE_DIM or array.shape[0] < 1:
+            raise ValueError(f"Feature cần dạng [T, 512], nhận {array.shape}: {path}")
+        if array.dtype not in (np.float16, np.float32, np.float64):
+            raise ValueError(f"Feature phải là số thực, nhận {array.dtype}: {path}")
+        return array
+
+
+    def frame_labels(row, length):
+        labels = np.zeros(length, dtype=np.uint8)
+        for start, end in row["intervals"]:
+            labels[start:end] = 1
+        return labels
+
+
+    def validate_ground_truth(rows, gt):
+        """Kiểm cả nội dung và thứ tự, ngoài phép kiểm tổng số frame."""
+        offset = 0
+        for row in rows:
+            stop = offset + row["steps"] * FRAMES_PER_FEATURE
+            expected = frame_labels(row, stop - offset)
+            if not np.array_equal(gt[offset:stop], expected):
+                raise ValueError(
+                    f"Ground truth lệch tại {row['id']} (frame offset {offset}, "
+                    f"{row['steps']} bước). Kiểm lại bản video/feature và frame count."
+                )
+            offset = stop
+        if offset != len(gt):
+            raise ValueError(f"Số frame không khớp: input={offset}, ground truth={len(gt)}")
+
+    # Kiểm đầu vào và đối chiếu hash với V0 đã chạy.
+    list_root = SRC_REPO / "list"
+    rows = read_split(list_root)
+    data_root = Path(DATA_ROOT) if DATA_ROOT is not None else INPUT
+    expected = {row["feature_name"].casefold(): row["feature_name"] for row in rows}
+    found = find_inputs(data_root, expected)
+    missing = sorted(expected[key] for key in expected if not found[key])
+    ambiguous = {
+        expected[key]: [str(path) for path in sorted(found[key])]
+        for key in expected if len(found[key]) > 1
+    }
+    if missing or ambiguous:
+        issue_path = OUTPUT / "input_issues.json"
+        issue_path.write_text(json.dumps({
+            "missing": missing,
+            "ambiguous": ambiguous,
+        }, indent=2), encoding="utf-8")
+        raise RuntimeError(
+            f"Thiếu {len(missing)} file, trùng {len(ambiguous)} ID. "
+            f"Xem {issue_path} và kiểm DATA_ROOT."
+        )
+    for row in rows:
+        path = found[row["feature_name"].casefold()][0]
+        row["path"] = path
+        row["steps"] = len(feature_array(path))
+        row["feature_sha256"] = sha256(path)
+
+    gt = np.load(list_root / "gt_ucf.npy", allow_pickle=False)
+    if gt.ndim != 1 or set(np.unique(gt)) != {0.0, 1.0}:
+        raise ValueError("Ground truth UCF cần vector nhị phân cấp frame.")
+    validate_ground_truth(rows, gt)
+    checkpoint_path = choose_checkpoint()
+    input_hashes = input_fingerprint(rows, list_root, checkpoint_path)
+    mismatches = [key for key, value in EXPECTED_INPUTS.items() if input_hashes[key] != value]
+    if mismatches:
+        raise ValueError("Đầu vào khác lượt V0 đã đối chiếu: " + ", ".join(mismatches))
+    print(f"Đã khớp {len(rows)} video, {len(gt):,} frame và toàn bộ hash đầu vào với V0.")
+
+    import torch
+
+    sys.path.insert(0, str(runtime_src))
+    from model import CLIPVAD
+    from ucf_option import parser as ucf_parser
+    from utils.tools import get_batch_mask
+
+    if not torch.cuda.is_available():
+        raise RuntimeError("Hãy bật GPU trong Kaggle. Mã VadCLIP gốc cần CUDA khi chạy forward.")
+    device = torch.device("cuda:0")
+    torch.cuda.set_device(device)
+    torch.manual_seed(234)
+
+    # Dùng đúng cấu hình UCF từ mã tác giả, không đọc cờ của kernel Jupyter.
+    args = ucf_parser.parse_args([])
+    evaluated_checkpoint = checkpoint_path
+    evaluated_sha256 = sha256(evaluated_checkpoint)
+    state = torch.load(evaluated_checkpoint, map_location="cpu", weights_only=True)
+    if isinstance(state, dict):
+        for field in ("state_dict", "model_state_dict"):
+            if field in state:
+                state = state[field]
+                break
+    if CLIP_WEIGHTS is not None:
+        prepare_clip_cache(Path(CLIP_WEIGHTS), Path.home() / ".cache" / "clip")
+    try:
+        model = CLIPVAD(
+            args.classes_num, args.embed_dim, args.visual_length, args.visual_width, args.visual_head,
+            args.visual_layers, args.attn_window, args.prompt_prefix, args.prompt_postfix, device,
+        )
+    except URLError as exc:
+        raise RuntimeError(
+            "Không tải được CLIP ViT-B/16. Bật Internet hoặc gắn ViT-B-16.pt chính thức "
+            "và đặt CLIP_WEIGHTS bằng đường dẫn file."
+        ) from exc
+    try:
+        model.load_state_dict(state, strict=True)
+    except (RuntimeError, TypeError) as exc:
+        raise RuntimeError(
+            f"Checkpoint không khớp model VadCLIP UCF-Crime: {evaluated_checkpoint}. "
+            "Kiểm lại file từ cột Model dòng UCF-Crime, khác file ViT-B-16.pt."
+        ) from exc
+    del state
+    model.to(device).eval()
+    print("Đã nạp đầy đủ checkpoint trên", torch.cuda.get_device_name(device))
+
+    def predict_video(feature, model, device, block_length):
+        """Trả điểm [T, 2], lần lượt sigmoid(C) và 1-softmax(A)[Normal]."""
+        steps = len(feature)
+        if steps < 1 or not np.isfinite(feature).all():
+            raise ValueError("Feature rỗng hoặc chứa NaN/Inf.")
+        blocks = (steps + block_length - 1) // block_length
+        padded = np.zeros((blocks * block_length, FEATURE_DIM), dtype=np.float32)
+        padded[:steps] = feature
+        lengths = torch.tensor([
+            min(block_length, steps - i * block_length) for i in range(blocks)
+        ])
+        visual = torch.from_numpy(padded.reshape(blocks, block_length, FEATURE_DIM)).to(device)
+        mask = get_batch_mask(lengths, block_length).to(device)
+        with torch.no_grad():
+            if VARIANT == "v0":
+                _, logits_c, logits_a = model(visual, mask, list(CLASSES), lengths)
+            else:
+                _, logits_c, logits_a = anchor_forward(
+                    model, model, visual, mask, list(CLASSES), lengths,
+                    ANCHOR_CONFIG, anchor_records,
+                )
+            c_score = logits_c.reshape(-1)[:steps].sigmoid()
+            a_score = 1 - logits_a.reshape(-1, len(CLASSES))[:steps].softmax(dim=-1)[:, 0]
+            scores = torch.stack((c_score, a_score), dim=1).cpu().numpy()
+        if scores.shape != (steps, 2) or not np.isfinite(scores).all():
+            raise ValueError(f"Điểm bất thường không hợp lệ: {scores.shape}")
+        return scores
+
+
+    def run_video(row):
+        feature = feature_array(row["path"])
+        if feature.shape != (row["steps"], FEATURE_DIM):
+            raise ValueError(f"Feature {row['id']} sai shape: {feature.shape}")
+        result = predict_video(feature, model, device, args.visual_length)
+        if VARIANT != "v0":
+            anchor_records[-1]["video_id"] = row["id"]
+        return result
+
+
+    # Chọn theo thứ tự split và độ dài, trước khi xem điểm.
+    pilot = sorted({
+        next(i for i, row in enumerate(rows) if row["label"] != "Normal"),
+        next(i for i, row in enumerate(rows) if row["label"] == "Normal"),
+        max(range(len(rows)), key=lambda i: rows[i]["steps"]),
+    })
+    torch.cuda.reset_peak_memory_stats(device)
+    started = time.perf_counter()
+    scores_by_index = {}
+    for i in pilot:
+        before = time.perf_counter()
+        scores_by_index[i] = run_video(rows[i])
+        print(rows[i]["id"], scores_by_index[i].shape, f"{time.perf_counter() - before:.2f}s")
+    smoke_seconds = time.perf_counter() - started
+    print(f"Smoke test hoàn tất trong {smoke_seconds:.2f}s.")
+
+    if not SMOKE_ONLY:
+        for i, row in enumerate(rows):
+            if i not in scores_by_index:
+                scores_by_index[i] = run_video(row)
+            if (i + 1) % 25 == 0 or i + 1 == len(rows):
+                print(f"Đã chạy {i + 1}/{len(rows)} video", flush=True)
+
+    from importlib.metadata import version
+
+    from sklearn.metrics import average_precision_score, roc_auc_score
+
+    SCORE_COLUMNS = ("classification", "alignment")
+
+
+
+
+    def score_benchmark(rows, snippet_scores, gt):
+        steps_per_video = np.asarray([row["steps"] for row in rows])
+        if snippet_scores.shape != (sum(steps_per_video), len(SCORE_COLUMNS)):
+            raise ValueError("Số điểm snippet hoặc cột không khớp.")
+        frame_scores = np.repeat(snippet_scores, FRAMES_PER_FEATURE, axis=0)
+        if len(frame_scores) != len(gt):
+            raise ValueError("Số điểm cấp frame không khớp ground truth.")
+        frame_mask = np.repeat(
+            [row["label"] != "Normal" for row in rows],
+            steps_per_video * FRAMES_PER_FEATURE,
+        )
+        metrics = {}
+        for column, name in enumerate(SCORE_COLUMNS):
+            scores = frame_scores[:, column]
+            metrics[name] = {
+                "roc_auc": float(roc_auc_score(gt, scores)),
+                "ap": float(average_precision_score(gt, scores)),
+                "ano_auc": float(roc_auc_score(gt[frame_mask], scores[frame_mask])),
+            }
+        return metrics
+
+
+    selected = sorted(scores_by_index)
+    if not SMOKE_ONLY and selected != list(range(len(rows))):
+        raise ValueError("Thiếu dự đoán. Cần chạy toàn bộ split trước khi chấm.")
+    selected_rows = [rows[i] for i in selected]
+    ordered = [scores_by_index[i] for i in selected]
+    if any(score.shape != (row["steps"], 2)
+           for row, score in zip(selected_rows, ordered, strict=True)):
+        raise ValueError("Số điểm từng video không khớp.")
+    steps_per_video = [row["steps"] for row in selected_rows]
+    scores = np.concatenate(ordered, axis=0)
+
+    output_dir = OUTPUT / ("smoke" if SMOKE_ONLY else "full")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    metadata = {
+        "run_kind": "smoke_inference" if SMOKE_ONLY else "full_checkpoint_inference",
+        "benchmark_scope": "ucf_crime_official_test",
+        "evaluation_status": "exploratory_on_previously_seen_official_test",
+        "commit": COMMIT,
+        "runtime_patch": "CLIP imports packaging.version directly",
+        **input_hashes,
+        "clip_backbone_sha256": CLIP_SHA256,
+        "frames_per_feature": FRAMES_PER_FEATURE,
+        "visual_block_length": args.visual_length,
+        "label_order": CLASSES,
+        "score_columns": SCORE_COLUMNS,
+        "evaluated_checkpoint_sha256": evaluated_sha256,
+        "python": sys.version.split()[0],
+        "libraries": {name: version(name) for name in (
+            "torch", "torchvision", "numpy", "scipy", "scikit-learn", "pillow",
+        )},
+        "cuda": torch.version.cuda,
+        "gpu": torch.cuda.get_device_name(device),
+        "smoke_seconds": smoke_seconds,
+        "inference_seconds": time.perf_counter() - started,
+        "peak_torch_vram_mib": torch.cuda.max_memory_allocated(device) / (1024 ** 2),
+        "video_count": len(selected_rows),
+        "videos": [{key: value for key, value in row.items() if key != "path"}
+                   for row in selected_rows],
+        "metrics": None, "anchor_config": ANCHOR_CONFIG, **model_receipt,
+    }
+    if not SMOKE_ONLY:
+        metrics = score_benchmark(rows, scores, gt)
+        metadata["metrics"] = metrics
+        print(json.dumps(metrics, indent=2))
+
+    np.savez_compressed(
+        output_dir / "predictions.npz",
+        video_id=np.asarray([row["id"] for row in selected_rows]),
+        video_label=np.asarray([row["label"] for row in selected_rows]),
+        snippet_offsets=np.cumsum([0] + steps_per_video),
+        score_columns=np.asarray(SCORE_COLUMNS),
+        scores=scores,
+        frame_gt=gt if not SMOKE_ONLY else np.empty(0, dtype=np.uint8),
+    )
+    (output_dir / "run.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+    (output_dir / "anchor_diagnostics.json").write_text(
+        json.dumps(anchor_records, indent=2), encoding="utf-8")
+    stage_directory.cleanup()
+    print("Đầu ra", output_dir)
+
+main()
