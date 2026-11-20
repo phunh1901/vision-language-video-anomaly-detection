@@ -1,0 +1,37 @@
+def temporal_evidence(c, binary_a):
+    c_prob, a_prob = c.sigmoid(), binary_a.sigmoid()
+    evidence = (c_prob + a_prob) / 2
+    neighbor = torch.maximum(F.pad(evidence[:-1], (1, 0)), F.pad(evidence[1:], (0, 1)))
+    support = torch.minimum(evidence, neighbor)
+    return evidence, support, torch.maximum(c_prob, a_prob)
+
+
+def gated_delta(raw, support, strength):
+    gate = ((support - 0.35) / 0.30).clamp(0, 1)
+    return strength * gate * raw
+
+
+def load_head(path, strength, use_temporal, device):
+    head = TemporalHead().to(device)
+    head.load_state_dict(torch.load(path, map_location=device, weights_only=True), strict=True)
+    return head.eval(), strength, use_temporal
+
+
+@torch.no_grad()
+def apply_head(bundle, clip, lengths, c, a, primary):
+    if bundle is None:
+        return c, a
+    head, strength, use_temporal = bundle
+    steps = int(torch.as_tensor(lengths).sum())
+    c_logit, a_logit = anomaly_logits(c, a)
+    _, support, _ = temporal_evidence(c_logit.flatten()[:steps], a_logit.flatten()[:steps])
+    raw = head(clip.reshape(-1, 512)[:steps], use_temporal)
+    delta = gated_delta(raw, support, strength)
+    if not torch.isfinite(delta).all():
+        raise ValueError("Non-finite V19 residual")
+    delta = F.pad(delta, (0, clip.shape[0] * clip.shape[1] - steps)).reshape(clip.shape[:2])
+    if primary == "C":
+        return c + delta[..., None].to(c.dtype), a
+    modified = a.clone()
+    modified[..., 0] -= delta.to(a.dtype)
+    return c, modified
