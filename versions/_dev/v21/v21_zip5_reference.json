@@ -1,0 +1,132 @@
+{
+  "run": "run_4jua44k6",
+  "recipe": "SANITY_FIXED_C",
+  "zip_sha256": "53fcf192069f1ff90dbdd3ee4f5b4e2a32db1fef1d641112ed8486d65819ff8a",
+  "scope": "historical comparison; native heads/fusion/objective differ",
+  "datasets": {
+    "ucf": {
+      "metrics": {
+        "classification": {
+          "roc_auc": 0.8005973433376804,
+          "ap": 0.1987258240003779,
+          "ano_auc": 0.5705055627123627
+        },
+        "alignment": {
+          "roc_auc": 0.7197610517295434,
+          "ap": 0.1405228259995475,
+          "ano_auc": 0.5239212627739682
+        }
+      },
+      "protocol": {
+        "split_sha256": "d621f4ccfb3e26274d215ad53b83fd1f596bb7e9f85cde69e01399db3da97c7f",
+        "ground_truth_sha256": "c6448801e0f73d19adf82506cd58d60a90c4f0913e49dcc1ad1d677ee12d6301",
+        "initial_v0_checkpoint_sha256": "d064aba05190ce5f6652151e6259b24ca6dda83a1e6289bf343afb6f905a2c79",
+        "visual_block_length": 256,
+        "frames_per_feature": 16
+      },
+      "training": {
+        "train_count": 1610,
+        "development_count": 0,
+        "train_csv_sha256": "33692e1198bb742a591786f74d964e4326aa717a0efd4355dc2e562ff871297f",
+        "feature_manifest_sha256": "08503ee0733dc34ca9b955ad8d7656d4de70fbe4903f1a716ca6aff56860683f"
+      }
+    },
+    "xd": {
+      "metrics": {
+        "branch_1": {
+          "frame_ap": 0.5696208905801899,
+          "roc_auc": 0.8769277092019285,
+          "gap_vs_paper_percentage_points": -27.547910941981
+        },
+        "branch_2": {
+          "frame_ap": 0.49614582419598474,
+          "roc_auc": 0.8648668130882522,
+          "gap_vs_paper_percentage_points": -34.89541758040152
+        }
+      },
+      "protocol": {
+        "split_sha256": "083bb0222a25390943d4d2ecc31c9377d8fb249a6be2aa28f1ba9cadbb6667b8",
+        "ground_truth_sha256": "35dcda70d7fb19a09645457b043a806aab512d526ed11446fde34382b87dd0e5",
+        "initial_v0_checkpoint_sha256": "a676c14d794a7046f7636041e601a5d9a2bef03708dbc4cae90f8b37ac2af2b4",
+        "visual_block_length": 256,
+        "frames_per_feature": 16
+      },
+      "training": {
+        "train_count": 3954,
+        "development_count": 0,
+        "train_csv_sha256": "ce7c92a8a033e9c05c71d409c2e84cdb9a537228164f558c8c653cfafaf344bd",
+        "feature_manifest_sha256": "156c0638d4668c4ef7896216108981e6d14cc582637ddad744a22db3718cf157"
+      }
+    }
+  },
+  "train_config": {
+    "paper_design": false,
+    "sanity_fix": true,
+    "initialization": "fresh_downstream",
+    "data_protocol": "official_train_final_epoch",
+    "epochs": 30,
+    "learning_rate": 0.0005,
+    "weight_decay": 5e-05,
+    "microbatch_size": 64,
+    "gradient_clip": 1.0,
+    "amp": false,
+    "pilot_epochs": 3,
+    "single_temperature": true,
+    "condition_modality_norms": true,
+    "initialization_probe_videos": 32,
+    "no_decay_scalars_bias_norm": true,
+    "optimizer_betas": [
+      0.9,
+      0.999
+    ],
+    "learning_health": true,
+    "health_batches_per_epoch": 2,
+    "verify_encoder_flow": true,
+    "amp_initial_scale": 1.0,
+    "amp_max_retries": 8,
+    "calibrate_initial_scale": false,
+    "calibrate_classifier_bias": true,
+    "phi": {
+      "ucf": 0.1,
+      "xd": 0.0001
+    },
+    "loss": {
+      "psi": 0.001,
+      "cone_aperture_scale": 0.1,
+      "entail_regularizer": 0.01,
+      "separation_margin": 1.0,
+      "alignment_loss_temperature": 1.0
+    },
+    "reproduction_disclosure": {
+      "exact_author_code_verified": false,
+      "numerical_precision": "FP32 encoders/fusion and BCE/CE; FP64 manifold/cone/distance regularizers and total loss; AMP disabled after nonfinite temporal gradients in run_wq5sdte1",
+      "temperature_interpretation": "single_scale_in_alignment_map_train_and_eval",
+      "sanity_changes": [
+        "train-only modality norm buffers; median of sampled-video median norms",
+        "classifier bias initialized to median TRAIN distance after conditioning",
+        "fixed curvature 0.5; no optimizer state for curvature",
+        "smooth tangent radial compression with relative-radius cap 0.95",
+        "atan2 exterior angle; keep aperture guards and report saturation",
+        "zero weight decay on scalars, bias/gain vectors; gradient norm clip 1.0"
+      ],
+      "text_mapping_interpretation": "d-dimensional ball, no appended zero coordinate",
+      "unreported_choices": {
+        "curvature_initial": 0.5,
+        "visual_fc_initial": "identity/sqrt(d)",
+        "prototype_initial": "normal_std_0.01",
+        "classifier_bias_initial": "train_median_distance",
+        "cone_aperture_scale": 0.1,
+        "entail_regularizer": 0.01,
+        "separation_margin": 1.0,
+        "entailment_pairs": "video-label MIL top-k",
+        "entailment_parent": "text",
+        "temporal_sampling_length": 256,
+        "scheduler_eta_min": 0.0,
+        "checkpoint_rule": "fixed_epoch_30_no_test_selection"
+      },
+      "feature_grid": "locked VadCLIP cached features; not verified as paper stride-8 extraction"
+    }
+  },
+  "seed": 42,
+  "effective_batch": 64
+}
