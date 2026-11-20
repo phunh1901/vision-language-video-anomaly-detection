@@ -1,0 +1,9 @@
+def centered_delta(raw, support, strength):
+    """Subtract the gate-weighted mean and preserve the shared logit cap."""
+    gate = ((support - 0.35) / 0.30).clamp(0, 1)
+    mean = (gate * raw).sum() / gate.sum().clamp_min(torch.finfo(raw.dtype).tiny)
+    centered = gate * (raw - mean)
+    peak = centered.abs().amax().clamp_min(2.)
+    return strength * centered * (2. / peak)
+
+
