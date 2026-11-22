@@ -1,0 +1,41 @@
+{
+  "schema": "public_vadclip_metric_summary_v1",
+  "version": "_unassigned",
+  "run_or_collection": "loose_root",
+  "verification_level": "read_scalar_metrics_from_saved_JSON; not independently replayed",
+  "metric_scale": "as recorded in source JSON; normally 0-1",
+  "archives": [
+    {
+      "filename": "extra.zip",
+      "sha256": "74ccbe3a990aaf6a2800ab62abd29e23a4ed246c69b85fd4e54faf1b771c59bd",
+      "included_in_git": false
+    }
+  ],
+  "records": [
+    {
+      "dataset": "unknown",
+      "variant_from_member_path": null,
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8801992605166816,
+        "ap": 0.3355725526808031,
+        "ano_auc": 0.7023225660564671
+      },
+      "source_archive": "extra.zip",
+      "source_member": "runs/imported_layout/run.json"
+    },
+    {
+      "dataset": "unknown",
+      "variant_from_member_path": null,
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8569383549283576,
+        "ap": 0.26500600012944775,
+        "ano_auc": 0.6552197604187565
+      },
+      "source_archive": "extra.zip",
+      "source_member": "runs/imported_layout/run.json"
+    }
+  ],
+  "missing_records_mean": "not found in supported schema; not zero or proof of no run"
+}

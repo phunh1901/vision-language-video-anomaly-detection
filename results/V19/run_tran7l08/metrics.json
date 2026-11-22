@@ -1,0 +1,161 @@
+{
+  "schema": "public_vadclip_metric_summary_v1",
+  "version": "V19",
+  "run_or_collection": "run_tran7l08",
+  "verification_level": "read_scalar_metrics_from_saved_JSON; not independently replayed",
+  "metric_scale": "as recorded in source JSON; normally 0-1",
+  "archives": [
+    {
+      "filename": "result.zip",
+      "sha256": "e9debfe1934f42a08412a9270a1a7924a918943be0b0829531b99263bce1d3c2",
+      "included_in_git": false
+    }
+  ],
+  "records": [
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "normal_only",
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8798001257487662,
+        "ap": 0.33489549719621026,
+        "ano_auc": 0.701202040356932
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/normal_only/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "normal_only",
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8575757284456234,
+        "ap": 0.2655391400302823,
+        "ano_auc": 0.6563510542036028
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/normal_only/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v19",
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8798470228864326,
+        "ap": 0.334960408184623,
+        "ano_auc": 0.7013404774279194
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/v19/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v19",
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8575757284456234,
+        "ap": 0.2655391400302823,
+        "ano_auc": 0.6563510542036028
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/v19/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v7",
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8802335993846885,
+        "ap": 0.33519409217224105,
+        "ano_auc": 0.7023242902080709
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/v7/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v7",
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8575757284456234,
+        "ap": 0.2655391400302823,
+        "ano_auc": 0.6563510542036028
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/v7/full/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "normal_only",
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8078007072590726,
+        "roc_auc": 0.9399441554778964,
+        "gap_vs_paper_percentage_points": -3.729929274092736
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/normal_only/full/run_4vih28db/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "normal_only",
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8485984579527968,
+        "roc_auc": 0.9481552688136554,
+        "gap_vs_paper_percentage_points": 0.3498457952796796
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/normal_only/full/run_4vih28db/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v19",
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8078007072590726,
+        "roc_auc": 0.9399441554778964,
+        "gap_vs_paper_percentage_points": -3.729929274092736
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/v19/full/run_th5rb9rz/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v19",
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8487098513694789,
+        "roc_auc": 0.9482089897681377,
+        "gap_vs_paper_percentage_points": 0.3609851369478889
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/v19/full/run_th5rb9rz/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v7",
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8078007072590726,
+        "roc_auc": 0.9399441554778964,
+        "gap_vs_paper_percentage_points": -3.729929274092736
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/v7/full/run_70po75u1/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v7",
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8461979894100824,
+        "roc_auc": 0.9474417753128095,
+        "gap_vs_paper_percentage_points": 0.10979894100824339
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/v7/full/run_70po75u1/run.json"
+    }
+  ],
+  "missing_records_mean": "not found in supported schema; not zero or proof of no run"
+}

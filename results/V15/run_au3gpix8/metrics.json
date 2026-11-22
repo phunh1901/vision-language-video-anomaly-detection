@@ -1,0 +1,16 @@
+{
+  "schema": "public_vadclip_metric_summary_v1",
+  "version": "V15",
+  "run_or_collection": "run_au3gpix8",
+  "verification_level": "read_scalar_metrics_from_saved_JSON; not independently replayed",
+  "metric_scale": "as recorded in source JSON; normally 0-1",
+  "archives": [
+    {
+      "filename": "result.zip",
+      "sha256": "322b60ef1d9c51b2545a58e3b4e029d657a6ced32cec3551228957faad10d4f5",
+      "included_in_git": false
+    }
+  ],
+  "records": [],
+  "missing_records_mean": "not found in supported schema; not zero or proof of no run"
+}

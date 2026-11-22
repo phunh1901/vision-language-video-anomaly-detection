@@ -1,0 +1,209 @@
+{
+  "schema": "public_vadclip_metric_summary_v1",
+  "version": "V18",
+  "run_or_collection": "run_55zyk2nz",
+  "verification_level": "read_scalar_metrics_from_saved_JSON; not independently replayed",
+  "metric_scale": "as recorded in source JSON; normally 0-1",
+  "archives": [
+    {
+      "filename": "result.zip",
+      "sha256": "1210fe7a5e5eb39d93505e0b29fa776fc01c9c342b64aa709af0720f662f0073",
+      "included_in_git": false
+    }
+  ],
+  "records": [
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "clip_only",
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8802335993846885,
+        "ap": 0.33519409217224105,
+        "ano_auc": 0.7023242902080709
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/clip_only/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "clip_only",
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8575757284456234,
+        "ap": 0.2655391400302823,
+        "ano_auc": 0.6563510542036028
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/clip_only/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "temporal_random",
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8802335993846885,
+        "ap": 0.33519409217224105,
+        "ano_auc": 0.7023242902080709
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/temporal_random/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "temporal_random",
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8575757284456234,
+        "ap": 0.2655391400302823,
+        "ano_auc": 0.6563510542036028
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/temporal_random/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v18",
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8802335993846885,
+        "ap": 0.33519409217224105,
+        "ano_auc": 0.7023242902080709
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/v18/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v18",
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8575757284456234,
+        "ap": 0.2655391400302823,
+        "ano_auc": 0.6563510542036028
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/v18/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v7",
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8802335993846885,
+        "ap": 0.33519409217224105,
+        "ano_auc": 0.7023242902080709
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/v7/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v7",
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8575757284456234,
+        "ap": 0.2655391400302823,
+        "ano_auc": 0.6563510542036028
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/v7/full/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "clip_only",
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8078007072590726,
+        "roc_auc": 0.9399441554778964,
+        "gap_vs_paper_percentage_points": -3.729929274092736
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/clip_only/full/run_67a827d7/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "clip_only",
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8226735882482474,
+        "roc_auc": 0.9432635622126987,
+        "gap_vs_paper_percentage_points": -2.242641175175253
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/clip_only/full/run_67a827d7/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "temporal_random",
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8078007072590726,
+        "roc_auc": 0.9399441554778964,
+        "gap_vs_paper_percentage_points": -3.729929274092736
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/temporal_random/full/run_mb2edhph/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "temporal_random",
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8367968471193549,
+        "roc_auc": 0.9470205461206987,
+        "gap_vs_paper_percentage_points": -0.8303152880645093
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/temporal_random/full/run_mb2edhph/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v18",
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8078007072590726,
+        "roc_auc": 0.9399441554778964,
+        "gap_vs_paper_percentage_points": -3.729929274092736
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/v18/full/run_e9a_6vsx/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v18",
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.7975920492655341,
+        "roc_auc": 0.9419398030271804,
+        "gap_vs_paper_percentage_points": -4.750795073446589
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/v18/full/run_e9a_6vsx/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v7",
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8078007072590726,
+        "roc_auc": 0.9399441554778964,
+        "gap_vs_paper_percentage_points": -3.729929274092736
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/v7/full/run_xezgb20t/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v7",
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8461979894100824,
+        "roc_auc": 0.9474417753128095,
+        "gap_vs_paper_percentage_points": 0.10979894100824339
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/v7/full/run_xezgb20t/run.json"
+    }
+  ],
+  "missing_records_mean": "not found in supported schema; not zero or proof of no run"
+}

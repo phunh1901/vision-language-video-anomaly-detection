@@ -1,0 +1,113 @@
+{
+  "schema": "public_vadclip_metric_summary_v1",
+  "version": "V21",
+  "run_or_collection": "run_djs32hmj",
+  "verification_level": "read_scalar_metrics_from_saved_JSON; not independently replayed",
+  "metric_scale": "as recorded in source JSON; normally 0-1",
+  "archives": [
+    {
+      "filename": "result.zip",
+      "sha256": "f77ab9ae606a7796998a5bc8e8346f66a887aa3c4e05a1f5555514917118badd",
+      "included_in_git": false
+    }
+  ],
+  "records": [
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v0",
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8801992605166816,
+        "ap": 0.3355725526808031,
+        "ano_auc": 0.7023225660564671
+      },
+      "source_archive": "result.zip",
+      "source_member": "vadclip_v21/run_djs32hmj/ucf/v0/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v0",
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8569383549283576,
+        "ap": 0.26500600012944775,
+        "ano_auc": 0.6552197604187565
+      },
+      "source_archive": "result.zip",
+      "source_member": "vadclip_v21/run_djs32hmj/ucf/v0/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v21",
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8015751435285893,
+        "ap": 0.17119694851095027,
+        "ano_auc": 0.5397030078543017
+      },
+      "source_archive": "result.zip",
+      "source_member": "vadclip_v21/run_djs32hmj/ucf/v21/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v21",
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8617552318326714,
+        "ap": 0.29643870133608485,
+        "ano_auc": 0.6703542542571574
+      },
+      "source_archive": "result.zip",
+      "source_member": "vadclip_v21/run_djs32hmj/ucf/v21/full/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v0",
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8030845903723635,
+        "roc_auc": 0.9390886130943051,
+        "gap_vs_paper_percentage_points": -4.20154096276365
+      },
+      "source_archive": "result.zip",
+      "source_member": "vadclip_v21/run_djs32hmj/xd/v0/full/run_z0sdd5b3/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v0",
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8450448809004643,
+        "roc_auc": 0.946812650099563,
+        "gap_vs_paper_percentage_points": -0.005511909953570537
+      },
+      "source_archive": "result.zip",
+      "source_member": "vadclip_v21/run_djs32hmj/xd/v0/full/run_z0sdd5b3/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v21",
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.6812926193208051,
+        "roc_auc": 0.9088873980321862,
+        "gap_vs_paper_percentage_points": -16.380738067919488
+      },
+      "source_archive": "result.zip",
+      "source_member": "vadclip_v21/run_djs32hmj/xd/v21/full/run_os94vdcv/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v21",
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.68671076323312,
+        "roc_auc": 0.919757220855692,
+        "gap_vs_paper_percentage_points": -15.838923676688
+      },
+      "source_archive": "result.zip",
+      "source_member": "vadclip_v21/run_djs32hmj/xd/v21/full/run_os94vdcv/run.json"
+    }
+  ],
+  "missing_records_mean": "not found in supported schema; not zero or proof of no run"
+}

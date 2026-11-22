@@ -1,0 +1,89 @@
+{
+  "schema": "public_vadclip_metric_summary_v1",
+  "version": "V01",
+  "run_or_collection": "historical_local",
+  "verification_level": "read_scalar_metrics_from_saved_JSON; not independently replayed",
+  "metric_scale": "as recorded in source JSON; normally 0-1",
+  "archives": [
+    {
+      "filename": "extra.zip",
+      "sha256": "8aa3a9c50769e52fa32d6c78e00e90d5ab1d94dea75d92e76cb0cba9b4f85423",
+      "included_in_git": false
+    }
+  ],
+  "records": [
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": null,
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8801992605166816,
+        "ap": 0.3355725526808031,
+        "ano_auc": 0.7023225660564671
+      },
+      "source_archive": "extra.zip",
+      "source_member": "UCF/run (1).json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": null,
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8569383549283576,
+        "ap": 0.26500600012944775,
+        "ano_auc": 0.6552197604187565
+      },
+      "source_archive": "extra.zip",
+      "source_member": "UCF/run (1).json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": null,
+      "branch": "fusion_v1",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8755714907913832,
+        "ap": 0.3088158385713251,
+        "ano_auc": 0.692105827595185
+      },
+      "source_archive": "extra.zip",
+      "source_member": "UCF/run (1).json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": null,
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8030845903723635,
+        "roc_auc": 0.9390886130943051,
+        "gap_vs_paper_percentage_points": -4.20154096276365
+      },
+      "source_archive": "extra.zip",
+      "source_member": "XD/run (2).json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": null,
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8450448809004643,
+        "roc_auc": 0.946812650099563,
+        "gap_vs_paper_percentage_points": -0.005511909953570537
+      },
+      "source_archive": "extra.zip",
+      "source_member": "XD/run (2).json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": null,
+      "branch": "fusion_v1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8245829497200332,
+        "roc_auc": 0.9424416148410892,
+        "gap_vs_paper_percentage_points": -2.0517050279966753
+      },
+      "source_archive": "extra.zip",
+      "source_member": "XD/run (2).json"
+    }
+  ],
+  "missing_records_mean": "not found in supported schema; not zero or proof of no run"
+}

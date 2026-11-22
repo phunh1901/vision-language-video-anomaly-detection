@@ -1,0 +1,65 @@
+{
+  "schema": "public_vadclip_metric_summary_v1",
+  "version": "V00",
+  "run_or_collection": "run_gs1ntqbt",
+  "verification_level": "read_scalar_metrics_from_saved_JSON; not independently replayed",
+  "metric_scale": "as recorded in source JSON; normally 0-1",
+  "archives": [
+    {
+      "filename": "result.zip",
+      "sha256": "c1901b84ba00f81f2acd77be0a0d3daa677897c0a563661f10779eed454bbaa0",
+      "included_in_git": false
+    }
+  ],
+  "records": [
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v0",
+      "branch": "classification",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8801992605166816,
+        "ap": 0.3355725526808031,
+        "ano_auc": 0.7023225660564671
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/v0/full/run.json"
+    },
+    {
+      "dataset": "ucf",
+      "variant_from_member_path": "v0",
+      "branch": "alignment",
+      "metrics_as_recorded": {
+        "roc_auc": 0.8569383549283576,
+        "ap": 0.26500600012944775,
+        "ano_auc": 0.6552197604187565
+      },
+      "source_archive": "result.zip",
+      "source_member": "ucf/v0/full/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v0",
+      "branch": "branch_1",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8030845903723635,
+        "roc_auc": 0.9390886130943051,
+        "gap_vs_paper_percentage_points": -4.20154096276365
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/v0/full/run_gs1ntqbt/run.json"
+    },
+    {
+      "dataset": "xd",
+      "variant_from_member_path": "v0",
+      "branch": "branch_2",
+      "metrics_as_recorded": {
+        "frame_ap": 0.8450448809004643,
+        "roc_auc": 0.946812650099563,
+        "gap_vs_paper_percentage_points": -0.005511909953570537
+      },
+      "source_archive": "result.zip",
+      "source_member": "xd/v0/full/run_gs1ntqbt/run.json"
+    }
+  ],
+  "missing_records_mean": "not found in supported schema; not zero or proof of no run"
+}
