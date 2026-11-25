@@ -5,108 +5,13 @@
     "sha256": "e996612dfbb25707271405f7cfe66440b2d04eb106bb04d3c3c4becdc01a9298"
   },
   {
-    "version": "V01",
-    "notebook": "versions/V01.ipynb",
-    "sha256": "1f5b7aafe219b9aa94036b32c22b2ca45592ec2361493cbb62d8890051f97118"
-  },
-  {
-    "version": "V02",
-    "notebook": "versions/V02.ipynb",
-    "sha256": "34906c0122d42e776aba20144f6f4cc84fb71da503dcbdfb0c7444707dae462f"
-  },
-  {
-    "version": "V03",
-    "notebook": "versions/V03.ipynb",
-    "sha256": "a3b1ef90dd8d30e418d67babdf6b87154cdf91c28af759dfd01a10efd0c9e0f8"
-  },
-  {
-    "version": "V04",
-    "notebook": "versions/V04.ipynb",
-    "sha256": "c4599c2049b305d8529db4d7ccd8aed5010c89d5743c49a828eefb4253ce59ac"
-  },
-  {
-    "version": "V05",
-    "notebook": "versions/V05.ipynb",
-    "sha256": "d5cf6bfae946436dab4cdc52a483051cb0810135891de980766db7de65b95ea2"
-  },
-  {
-    "version": "V06",
-    "notebook": "versions/V06.ipynb",
-    "sha256": "b324d3e96eb2a22363c1131a352dd99b05c5c2edbe32cc50754e536a37dd799c"
-  },
-  {
     "version": "V07",
     "notebook": "versions/V07.ipynb",
     "sha256": "26cd560e6e665b3608d795b2e37505adc71a9594338de0d438efa21d6c7e67e9"
   },
   {
-    "version": "V08",
-    "notebook": "versions/V08.ipynb",
-    "sha256": "33e466e3d82187c0157b8617b686fcfaa5a0c62b18c96a9a3bff7d0cc3dda319"
-  },
-  {
-    "version": "V09",
-    "notebook": "versions/V09.ipynb",
-    "sha256": "4c4581eaee31630279785eb1240c1ad84bb8d8568ff35274580a3792fad6d527"
-  },
-  {
-    "version": "V10",
-    "notebook": "versions/V10.ipynb",
-    "sha256": "ccbe836f7f69d2ccbba0a0df0728f2e1b42aebf498bb58976fb2a537920a7564"
-  },
-  {
-    "version": "V11",
-    "notebook": "versions/V11.ipynb",
-    "sha256": "44a3b954af1dafb5f0c21f1363d158bade7241d49e574e35caf3cb952c0dd975"
-  },
-  {
-    "version": "V12",
-    "notebook": "versions/V12.ipynb",
-    "sha256": "c4e98d99d083f91fc495d25c2afd190f7f8fd3e4fe07d1793c37c963608a3778"
-  },
-  {
-    "version": "V13",
-    "notebook": "versions/V13.ipynb",
-    "sha256": "c25e6b89ed6b530f876240081dfa1fa2247a811a8508765ef0d08c69f2217ee9"
-  },
-  {
-    "version": "V14",
-    "notebook": "versions/V14.ipynb",
-    "sha256": "8f8fa0a42d48ad6a8e07c75f090729c40af07e48cf126d89341459c69bcd5c12"
-  },
-  {
-    "version": "V15",
-    "notebook": "versions/V15.ipynb",
-    "sha256": "54816db6ebec27a8be4c6ecd3682b2c8a9afc8d935db8ee0f25cc2467518900c"
-  },
-  {
-    "version": "V16",
-    "notebook": "versions/V16.ipynb",
-    "sha256": "8c520b1dbfb0232d5d85da0c83e8a3988f02c305d2f0f01aa35271de01bb4e82"
-  },
-  {
-    "version": "V17",
-    "notebook": "versions/V17.ipynb",
-    "sha256": "444404caba74bc06da7928d30262f313af36557f60c71c65a2dd2af2c5e990e0"
-  },
-  {
-    "version": "V18",
-    "notebook": "versions/V18.ipynb",
-    "sha256": "1257f8cd2c029367b52c15abf46251bbf8e20b55bcc64c88c945ed9b233e4152"
-  },
-  {
-    "version": "V19",
-    "notebook": "versions/V19.ipynb",
-    "sha256": "1d928efa5aae6421c913d4bcc569724847768edb0736c9b9a060626802a1c81e"
-  },
-  {
     "version": "V20",
     "notebook": "versions/V20.ipynb",
     "sha256": "6859c030be7dc745bb822b1fa4946f6f887457f1107dc122e50ca1fd9da9553e"
-  },
-  {
-    "version": "V21",
-    "notebook": "versions/V21.ipynb",
-    "sha256": "17080c132b6447d0e93584a7a3c1f0733571ad1696318862942a678fd064c04d"
   }
 ]

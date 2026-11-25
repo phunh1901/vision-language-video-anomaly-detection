@@ -35,9 +35,9 @@ def test_private_documents_and_binary_output_are_excluded_at_any_depth():
 def test_code_and_reviewed_result_text_are_eligible():
     paths = [
         "README.md", ".gitignore", ".gitattributes", "pyproject.toml", "uv.lock",
-        "versions/V00.ipynb", "versions/V21.ipynb", "versions/_dev/v21/train_v21.py",
+        "versions/V00.ipynb", "versions/V07.ipynb", "versions/V20.ipynb",
         "tests/test_repository_layout.py", "tests/fixtures/notebook_hashes.json",
-        "results/README.md", "results/V21/run_c5ieenya/notes.md",
-        "results/V21/run_c5ieenya/metrics.json", "results/_unassigned/loose_root/metrics.json",
+        "results/README.md", "results/V07/run_tutkhmvv/notes.md",
+        "results/V20/run_259y0a3x/metrics.json",
     ]
     assert ignored(paths) == set()
